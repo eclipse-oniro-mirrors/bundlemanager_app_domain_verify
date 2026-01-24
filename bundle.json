@@ -15,7 +15,9 @@
     "syscap": [
       "SystemCapability.BundleManager.AppDomainVerify"
     ],
-    "features": ["app_domain_verify_feature_target_from_cloud"],
+    "features": [
+      "app_domain_verify_feature_target_from_cloud"
+    ],
     "hisysevent_config": [
       "//foundation/bundlemanager/app_domain_verify/hisysevent.yaml"
     ],
@@ -152,7 +154,8 @@
       ],
       "test": [
         "//foundation/bundlemanager/app_domain_verify/test/unittest:app_domain_verify_unit_test",
-        "//foundation/bundlemanager/app_domain_verify/test/fuzztest:app_domain_verify_fuzz_test"
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest:app_domain_verify_fuzz_test",
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/hu_fuzzer:fuzztest"
       ]
     }
   }
