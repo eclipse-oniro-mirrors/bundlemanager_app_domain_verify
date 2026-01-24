@@ -158,7 +158,9 @@
         "//foundation/bundlemanager/app_domain_verify/test/fuzztest/domainurlutil_fuzzer:fuzztest",
         "//foundation/bundlemanager/app_domain_verify/test/fuzztest/domainjsonutil_fuzzer:fuzztest",
         "//foundation/bundlemanager/app_domain_verify/test/fuzztest/domainverifier_fuzzer:fuzztest",
-        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/convertcallbackstub_fuzzer:fuzztest"
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/convertcallbackstub_fuzzer:fuzztest",
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/appdomainverifytaskmgr_fuzzer:fuzztest",
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/whitelistconfigmgr_fuzzer:fuzztest"
       ]
     }
   }
