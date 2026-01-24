@@ -61,15 +61,16 @@ namespace OHOS {
             return false;
         }
 
+        constexpr int modTwo = 2;
         // 1. Raw Data Mode: Test parser robustness against crashes
         // If odd, use raw content
-        if (size % 2 != 0) {
+        if (size % modTwo != 0) {
             FuzzJsonUtilWithRawData(data, size);
         }
 
         // 2. Template Mode: Test business object mapping logic
         // If even, switch to template mode
-        if (size % 2 == 0) {
+        if (size % modTwo == 0) {
             FuzzJsonUtilWithTemplate(data, size);
         }
 

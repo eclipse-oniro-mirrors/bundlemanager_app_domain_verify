@@ -45,9 +45,10 @@ namespace OHOS {
         info.appIdentifier = str;
         VerifyStatus status;
         status.status = InnerVerifyStatus::UNKNOWN;
-        status.retryCnt = static_cast<int>(size % 100);
+        constexpr int mod100 = 100;
+        status.retryCnt = static_cast<int>(size % mod100);
         status.verifyTime = str;
-        status.priority = static_cast<int>(size % 100);
+        status.priority = static_cast<int>(size % mod100);
         info.hostVerifyStatusMap.insert({str, status});
         Parcel outParcel2;
         info.Marshalling(outParcel2);

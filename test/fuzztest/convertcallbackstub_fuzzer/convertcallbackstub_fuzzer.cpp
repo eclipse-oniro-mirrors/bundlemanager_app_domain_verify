@@ -44,8 +44,9 @@ namespace OHOS {
             return false;
         }
 
+        constexpr int modTwo = 2;
         uint32_t code = static_cast<uint32_t>(data[0]);
-        if (data[0] % 2 == 0) {
+        if (data[0] % modTwo == 0) {
             code = static_cast<uint32_t>(ConvertCallbackInterfaceCode::ON_CONVERT_CALLBACK);
         }
 
