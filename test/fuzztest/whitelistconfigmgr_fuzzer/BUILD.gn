@@ -38,6 +38,7 @@ ohos_fuzztest("WhitelistconfigmgrFuzzTest") {
 
   external_deps = [
     "c_utils:utils",
+    "preferences:native_preferences",
   ]
 }
 ###############################################################################

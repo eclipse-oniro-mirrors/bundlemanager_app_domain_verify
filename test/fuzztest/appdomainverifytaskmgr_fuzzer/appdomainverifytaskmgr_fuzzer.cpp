@@ -25,11 +25,11 @@ using namespace OHOS::AppDomainVerify;
 
 class MockVerifyTask : public IVerifyTask {
 public:
-    void OnPostVerify(const std::string& uri, const NetStack::HttpClient::HttpClientResponse& response) override {}
+    void OnPostVerify(const std::string& uri, const OHOS::NetStack::HttpClient::HttpClientResponse& response) override {}
     void OnSaveVerifyResult() override {}
-    bool OnPreRequest(NetStack::HttpClient::HttpClientRequest& request, const std::string& uri) override { return true; }
+    bool OnPreRequest(OHOS::NetStack::HttpClient::HttpClientRequest& request, const std::string& uri) override { return true; }
     const HostVerifyStatusMap& GetUriVerifyMap() override { return map_; }
-    TaskType GetType() override { return static_cast<TaskType>(1); }
+    OHOS::AppDomainVerify::TaskType GetType() override { return static_cast<OHOS::AppDomainVerify::TaskType>(1); }
     HostVerifyStatusMap map_;
 };
 
@@ -48,13 +48,7 @@ namespace OHOS {
         auto httpTask = std::make_shared<VerifyHttpTask>(testUri, mockTask);
         
         // Fuzz AddTask
-        AppDomainVerifyTaskMgr::GetInstance()->AddTask(testString, httpTask);
-
-        // Fuzz HasTask
-        AppDomainVerifyTaskMgr::GetInstance()->HasTask(testString);
-        
-        // Fuzz RemoveTask
-        AppDomainVerifyTaskMgr::GetInstance()->RemoveTask(testString);
+        AppDomainVerifyTaskMgr::GetInstance()->AddTask(httpTask);
 
         return true;
     }

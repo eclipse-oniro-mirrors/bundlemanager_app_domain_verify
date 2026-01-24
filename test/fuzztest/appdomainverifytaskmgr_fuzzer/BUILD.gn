@@ -42,6 +42,8 @@ ohos_fuzztest("AppdomainverifytaskmgrFuzzTest") {
     "c_utils:utils",
     "netstack:http_client",
     "ffrt:libffrt",
+    "hisysevent:libhisysevent",
+    "hilog:libhilog",
   ]
 }
 ###############################################################################
