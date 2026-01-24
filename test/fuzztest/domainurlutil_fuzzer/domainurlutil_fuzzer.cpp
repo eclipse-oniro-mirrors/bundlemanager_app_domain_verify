@@ -21,7 +21,8 @@
 using namespace OHOS::AppDomainVerify;
 
 namespace OHOS {
-    void TestUrlUtil(const std::string& url) {
+    void TestUrlUtil(const std::string& url)
+    {
         UrlUtil::IsValidAppDomainVerifyHost(url);
         UrlUtil::IsValidUrl(url);
         UrlUtil::GetHost(url);
@@ -34,7 +35,7 @@ namespace OHOS {
             return false;
         }
         std::string rawData(reinterpret_cast<const char*>(data), size);
-        
+
         // 1. Raw Data Test
         TestUrlUtil(rawData);
 

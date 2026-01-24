@@ -23,18 +23,22 @@
 using namespace OHOS::AppDomainVerify;
 
 namespace OHOS {
-    void FuzzJsonUtilWithRawData(const uint8_t* data, size_t size) {
+    void FuzzJsonUtilWithRawData(const uint8_t* data, size_t size)
+    {
         std::string jsonStr(reinterpret_cast<const char*>(data), size);
         AssetJsonObj assetJsonObj;
         JsonUtil::Parse(jsonStr, assetJsonObj);
     }
 
-    void FuzzJsonUtilWithTemplate(const uint8_t* data, size_t size) {
-        if (size == 0) return;
+    void FuzzJsonUtilWithTemplate(const uint8_t* data, size_t size)
+    {
+        if (size == 0) {
+            return;
+        }
         std::string fuzzString(reinterpret_cast<const char*>(data), size);
-        
+
         // Construct a JSON structure containing core fields to ensure reaching object mapping logic
-        std::string jsonStr = 
+        std::string jsonStr =
             "{"
             "  \"applinking\": {"
             "    \"apps\": ["
@@ -46,7 +50,7 @@ namespace OHOS {
             "    ]"
             "  }"
             "}";
-            
+
         AssetJsonObj assetJsonObj;
         JsonUtil::Parse(jsonStr, assetJsonObj);
     }

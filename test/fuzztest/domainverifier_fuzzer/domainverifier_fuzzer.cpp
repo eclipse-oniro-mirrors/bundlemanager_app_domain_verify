@@ -30,20 +30,26 @@ namespace OHOS {
      * @brief Strategy 1: Test with pure random data.
      * Mainly tests the robustness of the JSON parser against malformed data to prevent crashes.
      */
-    void FuzzVerifyHostWithRawData(const uint8_t* data, size_t size) {
-         if (size < 4) return;
-         
-         // Randomly generate HTTP response code (0-599)
-         ResponseCode responseCode = static_cast<ResponseCode>(data[0] % 600);
-         
-         // Use the remaining data as a JSON string
-         std::string assetJsonsStr(reinterpret_cast<const char*>(data + 4), size - 4);
-         
-         // Construct a simple BaseInfo
-         AppVerifyBaseInfo appVerifyBaseInfo;
-         appVerifyBaseInfo.bundleName = "com.random.test"; 
-         
-         DomainVerifier::VerifyHost(responseCode, assetJsonsStr, appVerifyBaseInfo);
+    void FuzzVerifyHostWithRawData(const uint8_t* data, size_t size)
+    {
+        constexpr int32_t MIN_SIZE = 4;
+        constexpr int32_t RESPONSE_CODE_RANGE = 600;
+
+        if (size < MIN_SIZE) {
+            return;
+        }
+
+        // Randomly generate HTTP response code (0-599)
+        ResponseCode responseCode = static_cast<ResponseCode>(data[0] % RESPONSE_CODE_RANGE);
+
+        // Use the remaining data as a JSON string
+        std::string assetJsonsStr(reinterpret_cast<const char*>(data + MIN_SIZE), size - MIN_SIZE);
+
+        // Construct a simple BaseInfo
+        AppVerifyBaseInfo appVerifyBaseInfo;
+        appVerifyBaseInfo.bundleName = "com.random.test";
+
+        DomainVerifier::VerifyHost(responseCode, assetJsonsStr, appVerifyBaseInfo);
     }
 
     /**
@@ -51,17 +57,20 @@ namespace OHOS {
      * Ensures that the JSON parser passes and deeply covers the business logic branches within VerifyHost
      * (such as bundle name comparison and fingerprint verification).
      */
-    void FuzzVerifyHostWithTemplate(const uint8_t* data, size_t size) {
-        if (size == 0) return;
-        
+    void FuzzVerifyHostWithTemplate(const uint8_t* data, size_t size)
+    {
+        if (size == 0) {
+            return;
+        }
+
         // Convert random data to string for filling fields
         std::string fuzzString(reinterpret_cast<const char*>(data), size);
-        
+
         // Construct a valid JSON template
         // Structure based on: agent_constants.h and asset_json_obj.h
         // Construct a structure containing applinking -> apps array to ensure the parser can read content
         std::string bundleName = "com.fuzz.test";
-        std::string jsonStr = 
+        std::string jsonStr =
             "{"
             "  \"applinking\": {"
             "    \"apps\": ["
@@ -73,11 +82,11 @@ namespace OHOS {
             "    ]"
             "  }"
             "}";
-        
+
         AppVerifyBaseInfo info;
         info.bundleName = bundleName;   // 1. Ensure BundleName matches to enter fingerprint verification logic
         info.appIdentifier = "id_" + fuzzString;
-        
+
         // 2. Fingerprint matching test:
         // When size is even, fingerprint matches completely -> expected verification success
         // When size is odd, fingerprint mismatch -> expected verification failure
@@ -97,17 +106,17 @@ namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         // Combine two strategies to maximize test coverage
-        
+
         // 1. Pure random data (50% probability)
         if (size % 2 != 0) {
             FuzzVerifyHostWithRawData(data, size);
         }
-        
+
         // 2. Structured template data (50% probability)
         if (size % 2 == 0) {
             FuzzVerifyHostWithTemplate(data, size);
         }
-        
+
         return true;
     }
 }

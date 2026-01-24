@@ -55,14 +55,14 @@ namespace OHOS {
 
         MessageParcel request;
         request.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-        
+
         // Write the remaining data into Parcel to drive ReadInt32 and ReadParcelable
         request.WriteBuffer(data + 1, size - 1);
         request.RewindRead(0);
-        
+
         MessageParcel reply;
         MessageOption option;
-        
+
         ConvertCallbackStubFuzzer stub;
         stub.OnRemoteRequest(code, request, reply, option);
 
