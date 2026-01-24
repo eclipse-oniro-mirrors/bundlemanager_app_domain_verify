@@ -21,17 +21,30 @@
 using namespace OHOS::AppDomainVerify;
 
 namespace OHOS {
+    void TestUrlUtil(const std::string& url) {
+        UrlUtil::IsValidAppDomainVerifyHost(url);
+        UrlUtil::IsValidUrl(url);
+        UrlUtil::GetHost(url);
+        UrlUtil::GetScheme(url);
+    }
+
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         if (data == nullptr || size == 0) {
             return false;
         }
-        std::string url(reinterpret_cast<const char*>(data), size);
+        std::string rawData(reinterpret_cast<const char*>(data), size);
         
-        UrlUtil::IsValidAppDomainVerifyHost(url);
-        UrlUtil::IsValidUrl(url);
-        UrlUtil::GetHost(url);
-        UrlUtil::GetScheme(url);
+        // 1. Raw Data 测试
+        TestUrlUtil(rawData);
+
+        // 2. 构造带有常见 Scheme 的 URL，覆盖 IsValidUrl 内部对 Scheme 的检查
+        // 许多 URL 解析逻辑是依赖 Scheme 触发的
+        std::string httpUrl = "http://" + rawData;
+        TestUrlUtil(httpUrl);
+
+        std::string httpsUrl = "https://" + rawData;
+        TestUrlUtil(httpsUrl);
 
         return true;
     }

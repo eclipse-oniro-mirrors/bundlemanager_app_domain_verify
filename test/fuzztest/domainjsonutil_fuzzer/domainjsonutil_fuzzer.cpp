@@ -23,14 +23,52 @@
 using namespace OHOS::AppDomainVerify;
 
 namespace OHOS {
+    void FuzzJsonUtilWithRawData(const uint8_t* data, size_t size) {
+        std::string jsonStr(reinterpret_cast<const char*>(data), size);
+        AssetJsonObj assetJsonObj;
+        JsonUtil::Parse(jsonStr, assetJsonObj);
+    }
+
+    void FuzzJsonUtilWithTemplate(const uint8_t* data, size_t size) {
+        if (size == 0) return;
+        std::string fuzzString(reinterpret_cast<const char*>(data), size);
+        
+        // 构造包含核心字段的 JSON 结构，确保能走到对象映射逻辑
+        std::string jsonStr = 
+            "{"
+            "  \"applinking\": {"
+            "    \"apps\": ["
+            "      {"
+            "        \"bundleName\": \"com.example.test\","
+            "        \"appIdentifier\": \"" + fuzzString + "\","
+            "        \"fingerprint\": \"" + fuzzString + "\""
+            "      }"
+            "    ]"
+            "  }"
+            "}";
+            
+        AssetJsonObj assetJsonObj;
+        JsonUtil::Parse(jsonStr, assetJsonObj);
+    }
+
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         if (data == nullptr || size == 0) {
             return false;
         }
-        std::string jsonStr(reinterpret_cast<const char*>(data), size);
-        AssetJsonObj assetJsonObj;
-        JsonUtil::Parse(jsonStr, assetJsonObj);
+
+        // 1. Raw Data 模式: 测试解析器抗崩溃能力
+        // 如果是奇数，使用原始内容
+        if (size % 2 != 0) {
+            FuzzJsonUtilWithRawData(data, size);
+        }
+
+        // 2. Template 模式: 测试业务对象映射逻辑
+        // 如果是偶数，切入模板模式
+        if (size % 2 == 0) {
+            FuzzJsonUtilWithTemplate(data, size);
+        }
+
         return true;
     }
 }
