@@ -28,14 +28,12 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 
-// 常量定义 
 constexpr uint32_t CODE_MAX = 16;
 constexpr int32_t VECTOR_SIZE_MIN = 1;
 constexpr int32_t VECTOR_SIZE_MAX = 5;
 constexpr int32_t LOOP_COUNT_MAX = 10;
 constexpr int32_t RANDOM_STRING_LOOP = 5;
 
-// 命令字常量
 constexpr uint32_t CMD_VERIFY_DOMAIN = 1;
 constexpr uint32_t CMD_FILTER_ABILITIES = 3;
 constexpr uint32_t CMD_SAVE_VERIFY_STATUS = 5;
@@ -71,7 +69,6 @@ std::string GetFuzzBundleName(FuzzedDataProvider &fdp)
     }
 }
 
-// 辅助函数：处理 VerifyDomain (Code 1)
 void FuzzVerifyDomain(FuzzedDataProvider &fdp, MessageParcel &dataParcel)
 {
     dataParcel.WriteString(fdp.ConsumeRandomLengthString());
@@ -93,7 +90,6 @@ void FuzzVerifyDomain(FuzzedDataProvider &fdp, MessageParcel &dataParcel)
     }
 }
 
-// 辅助函数：处理 FilterAbilities
 void FuzzFilterAbilities(FuzzedDataProvider &fdp, MessageParcel &dataParcel)
 {
     AAFwk::Want want;
@@ -111,7 +107,6 @@ void FuzzFilterAbilities(FuzzedDataProvider &fdp, MessageParcel &dataParcel)
     }
 }
 
-// 辅助函数：处理 SaveVerifyStatus
 void FuzzSaveVerifyStatus(FuzzedDataProvider &fdp, MessageParcel &dataParcel)
 {
     dataParcel.WriteString(GetFuzzBundleName(fdp));
@@ -122,7 +117,6 @@ void FuzzSaveVerifyStatus(FuzzedDataProvider &fdp, MessageParcel &dataParcel)
     }
 }
 
-// 辅助函数：处理通用逻辑
 void FuzzDefault(FuzzedDataProvider &fdp, MessageParcel &dataParcel)
 {
     if (fdp.remaining_bytes() > 0) {
@@ -132,7 +126,56 @@ void FuzzDefault(FuzzedDataProvider &fdp, MessageParcel &dataParcel)
     }
 }
 
-// 主入口函数
+void FuzzCode8(FuzzedDataProvider &fdp, MessageParcel &dataParcel)
+{
+    uint32_t vectorSize = fdp.ConsumeIntegralInRange<uint32_t>(0, LOOP_COUNT_MAX);
+    dataParcel.WriteUint32(vectorSize);
+    for (uint32_t i = 0; i < vectorSize; ++i) {
+        dataParcel.WriteString("https://www.example.com");
+    }
+}
+
+void DispatchFuzzTest(uint32_t code, FuzzedDataProvider &fdp, MessageParcel &dataParcel)
+{
+    switch (code) {
+        case CMD_CODE_0:
+        case CMD_CODE_9:
+        case CMD_CODE_10:
+        case CMD_CODE_16:
+            dataParcel.WriteString(GetFuzzBundleName(fdp));
+            break;
+        case CMD_CODE_6:
+        case CMD_CODE_13:
+            dataParcel.WriteString(fdp.ConsumeRandomLengthString());
+            break;
+        case CMD_VERIFY_DOMAIN:
+            FuzzVerifyDomain(fdp, dataParcel);
+            break;
+        case CMD_SAVE_VERIFY_STATUS:
+            FuzzSaveVerifyStatus(fdp, dataParcel);
+            break;
+        case CMD_CODE_2:
+            dataParcel.WriteString(fdp.ConsumeRandomLengthString());
+            dataParcel.WriteString(GetFuzzBundleName(fdp));
+            break;
+        case CMD_CODE_8:
+            FuzzCode8(fdp, dataParcel);
+            break;
+        case CMD_FILTER_ABILITIES:
+            FuzzFilterAbilities(fdp, dataParcel);
+            break;
+        case CMD_QUERY_DETAILS_WANT:
+            dataParcel.WriteString("https://www.openharmony.cn/test");
+            dataParcel.WriteString(GetFuzzBundleName(fdp));
+            break;
+        case CMD_CODE_11:
+            break;
+        default:
+            FuzzDefault(fdp, dataParcel);
+            break;
+    }
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     FuzzedDataProvider fdp(data, size);
@@ -143,58 +186,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
         MessageParcel dataParcel;
         dataParcel.WriteInterfaceToken(INTERFACE_TOKEN);
 
-        switch (code) {
-            case CMD_CODE_0:
-            case CMD_CODE_9:
-            case CMD_CODE_10:
-            case CMD_CODE_16:
-                dataParcel.WriteString(GetFuzzBundleName(fdp));
-                break;
-            
-            case CMD_CODE_6:
-            case CMD_CODE_13:
-                dataParcel.WriteString(fdp.ConsumeRandomLengthString());
-                break;
-
-            case CMD_VERIFY_DOMAIN:
-                FuzzVerifyDomain(fdp, dataParcel);
-                break;
-
-            case CMD_SAVE_VERIFY_STATUS:
-                FuzzSaveVerifyStatus(fdp, dataParcel);
-                break;
-
-            case CMD_CODE_2:
-                dataParcel.WriteString(fdp.ConsumeRandomLengthString());
-                dataParcel.WriteString(GetFuzzBundleName(fdp));
-                break;
-
-            case CMD_CODE_8:
-                {
-                    uint32_t vectorSize = fdp.ConsumeIntegralInRange<uint32_t>(0, LOOP_COUNT_MAX);
-                    dataParcel.WriteUint32(vectorSize);
-                    for (uint32_t i = 0; i < vectorSize; ++i) {
-                        dataParcel.WriteString("https://www.example.com");
-                    }
-                }
-                break;
-
-            case CMD_FILTER_ABILITIES:
-                FuzzFilterAbilities(fdp, dataParcel);
-                break;
-            
-            case CMD_QUERY_DETAILS_WANT:
-                dataParcel.WriteString("https://www.openharmony.cn/test");
-                dataParcel.WriteString(GetFuzzBundleName(fdp));
-                break;
-
-            case CMD_CODE_11:
-                break;
-
-            default:
-                FuzzDefault(fdp, dataParcel);
-                break;
-        }
+        DispatchFuzzTest(code, fdp, dataParcel);
 
         dataParcel.RewindRead(0);
         MessageParcel reply;
@@ -202,7 +194,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 
         appDomainVerifyMgrService.OnRemoteRequest(code, dataParcel, reply, option);
     }
-
     return 0;
 }
 }
