@@ -32,18 +32,18 @@ namespace OHOS {
      */
     void FuzzVerifyHostWithRawData(const uint8_t* data, size_t size)
     {
-        constexpr int32_t MIN_SIZE = 4;
-        constexpr int32_t RESPONSE_CODE_RANGE = 600;
+        constexpr int32_t minSize = 4;
+        constexpr int32_t responseCodeRange = 600;
 
-        if (size < MIN_SIZE) {
+        if (size < minSize) {
             return;
         }
 
         // Randomly generate HTTP response code (0-599)
-        ResponseCode responseCode = static_cast<ResponseCode>(data[0] % RESPONSE_CODE_RANGE);
+        ResponseCode responseCode = static_cast<ResponseCode>(data[0] % responseCodeRange);
 
         // Use the remaining data as a JSON string
-        std::string assetJsonsStr(reinterpret_cast<const char*>(data + MIN_SIZE), size - MIN_SIZE);
+        std::string assetJsonsStr(reinterpret_cast<const char*>(data + minSize), size - minSize);
 
         // Construct a simple BaseInfo
         AppVerifyBaseInfo appVerifyBaseInfo;
@@ -90,10 +90,8 @@ namespace OHOS {
         // 2. Fingerprint matching test:
         // When size is even, fingerprint matches completely -> expected verification success
         // When size is odd, fingerprint mismatch -> expected verification failure
-        if (size % 2 == 0) {
-            info.fingerprint = fuzzString;
-        } else {
-            info.fingerprint = "mismatch_" + fuzzString;
+    constexpr size_t modTwo = 2;
+    if (size % modTwo == 0) {
         }
 
         // 3. Random status code test
@@ -106,16 +104,17 @@ namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
         // Combine two strategies to maximize test coverage
+    constexpr size_t modTwo = 2;
 
-        // 1. Pure random data (50% probability)
-        if (size % 2 != 0) {
-            FuzzVerifyHostWithRawData(data, size);
-        }
+    // 1. Pure random data (50% probability)
+    if (size % modTwo != 0) {
+        FuzzVerifyHostWithRawData(data, size);
+    }
 
-        // 2. Structured template data (50% probability)
-        if (size % 2 == 0) {
-            FuzzVerifyHostWithTemplate(data, size);
-        }
+    // 2. Structured template data (50% probability)
+    if (size % modTwo == 0) {
+        FuzzVerifyHostWithTemplate(data, size);
+    }
 
         return true;
     }

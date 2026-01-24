@@ -25,11 +25,14 @@ using namespace OHOS::AppDomainVerify;
 
 class MockVerifyTask : public IVerifyTask {
 public:
-    void OnPostVerify(const std::string& uri, const OHOS::NetStack::HttpClient::HttpClientResponse& response) override {}
+    void OnPostVerify(const std::string& uri,
+        const OHOS::NetStack::HttpClient::HttpClientResponse& response) override {}
     void OnSaveVerifyResult() override {}
-    bool OnPreRequest(OHOS::NetStack::HttpClient::HttpClientRequest& request, const std::string& uri) override { return true; }
+    bool OnPreRequest(OHOS::NetStack::HttpClient::HttpClientRequest& request,
+        const std::string& uri) override { return true; }
     const HostVerifyStatusMap& GetUriVerifyMap() override { return map_; }
-    OHOS::AppDomainVerify::TaskType GetType() override { return static_cast<OHOS::AppDomainVerify::TaskType>(1); }
+    OHOS::AppDomainVerify::TaskType GetType() override
+    { return static_cast<OHOS::AppDomainVerify::TaskType>(1); }
     HostVerifyStatusMap map_;
 };
 

@@ -44,10 +44,6 @@ namespace OHOS {
             return false;
         }
 
-        // Strategy upgrade:
-        // Use the first byte to determine whether to force hitting the business logic code.
-        // data[0] % 2 == 0 : Force code = ON_CONVERT_CALLBACK (0) to test the OnConvert branch mainly.
-        // data[0] % 2 != 0 : Use random code to test the robustness of the dispatch logic or default branch.
         uint32_t code = static_cast<uint32_t>(data[0]);
         if (data[0] % 2 == 0) {
             code = static_cast<uint32_t>(ConvertCallbackInterfaceCode::ON_CONVERT_CALLBACK);
