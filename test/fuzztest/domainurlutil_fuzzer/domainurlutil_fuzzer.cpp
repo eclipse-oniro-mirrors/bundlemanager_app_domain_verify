@@ -35,11 +35,11 @@ namespace OHOS {
         }
         std::string rawData(reinterpret_cast<const char*>(data), size);
         
-        // 1. Raw Data 测试
+        // 1. Raw Data Test
         TestUrlUtil(rawData);
 
-        // 2. 构造带有常见 Scheme 的 URL，覆盖 IsValidUrl 内部对 Scheme 的检查
-        // 许多 URL 解析逻辑是依赖 Scheme 触发的
+        // 2. Construct URL with common Scheme to cover Scheme check inside IsValidUrl
+        // Many URL parsing logics are triggered by Scheme
         std::string httpUrl = "http://" + rawData;
         TestUrlUtil(httpUrl);
 

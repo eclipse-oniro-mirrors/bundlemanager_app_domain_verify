@@ -33,7 +33,7 @@ namespace OHOS {
         if (size == 0) return;
         std::string fuzzString(reinterpret_cast<const char*>(data), size);
         
-        // 构造包含核心字段的 JSON 结构，确保能走到对象映射逻辑
+        // Construct a JSON structure containing core fields to ensure reaching object mapping logic
         std::string jsonStr = 
             "{"
             "  \"applinking\": {"
@@ -57,14 +57,14 @@ namespace OHOS {
             return false;
         }
 
-        // 1. Raw Data 模式: 测试解析器抗崩溃能力
-        // 如果是奇数，使用原始内容
+        // 1. Raw Data Mode: Test parser robustness against crashes
+        // If odd, use raw content
         if (size % 2 != 0) {
             FuzzJsonUtilWithRawData(data, size);
         }
 
-        // 2. Template 模式: 测试业务对象映射逻辑
-        // 如果是偶数，切入模板模式
+        // 2. Template Mode: Test business object mapping logic
+        // If even, switch to template mode
         if (size % 2 == 0) {
             FuzzJsonUtilWithTemplate(data, size);
         }

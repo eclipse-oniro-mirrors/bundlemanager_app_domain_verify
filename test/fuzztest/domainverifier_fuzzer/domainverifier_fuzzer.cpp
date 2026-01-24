@@ -27,19 +27,19 @@ using namespace OHOS::NetStack::HttpClient;
 
 namespace OHOS {
     /**
-     * @brief 策略1: 使用纯随机数据进行测试
-     * 主要测试 JSON 解析器在面对畸形数据时的鲁棒性，防止崩溃。
+     * @brief Strategy 1: Test with pure random data.
+     * Mainly tests the robustness of the JSON parser against malformed data to prevent crashes.
      */
     void FuzzVerifyHostWithRawData(const uint8_t* data, size_t size) {
          if (size < 4) return;
          
-         // 随机生成 HTTP 响应码 (0-599)
+         // Randomly generate HTTP response code (0-599)
          ResponseCode responseCode = static_cast<ResponseCode>(data[0] % 600);
          
-         // 剩余数据全部作为 JSON 字符串
+         // Use the remaining data as a JSON string
          std::string assetJsonsStr(reinterpret_cast<const char*>(data + 4), size - 4);
          
-         // 构造一个简单的 BaseInfo
+         // Construct a simple BaseInfo
          AppVerifyBaseInfo appVerifyBaseInfo;
          appVerifyBaseInfo.bundleName = "com.random.test"; 
          
@@ -47,18 +47,19 @@ namespace OHOS {
     }
 
     /**
-     * @brief 策略2: 使用模板构造合法 JSON 结构进行测试
-     * 确保能通过 JSON 解析，深入覆盖 VerifyHost 内部的业务逻辑分支（如包名比对、指纹验证）。
+     * @brief Strategy 2: Test with a template constructing a valid JSON structure.
+     * Ensures that the JSON parser passes and deeply covers the business logic branches within VerifyHost
+     * (such as bundle name comparison and fingerprint verification).
      */
     void FuzzVerifyHostWithTemplate(const uint8_t* data, size_t size) {
         if (size == 0) return;
         
-        // 将随机数据转换为字符串，用于填充字段
+        // Convert random data to string for filling fields
         std::string fuzzString(reinterpret_cast<const char*>(data), size);
         
-        // 构造合法的 JSON 模板
-        // 结构参考自: agent_constants.h 和 asset_json_obj.h
-        // 这里构造了一个包含 applinking -> apps 数组的结构，确保解析器能读到内容
+        // Construct a valid JSON template
+        // Structure based on: agent_constants.h and asset_json_obj.h
+        // Construct a structure containing applinking -> apps array to ensure the parser can read content
         std::string bundleName = "com.fuzz.test";
         std::string jsonStr = 
             "{"
@@ -74,20 +75,20 @@ namespace OHOS {
             "}";
         
         AppVerifyBaseInfo info;
-        info.bundleName = bundleName;   // 1. 确保 BundleName 匹配成功，进入指纹校验逻辑
+        info.bundleName = bundleName;   // 1. Ensure BundleName matches to enter fingerprint verification logic
         info.appIdentifier = "id_" + fuzzString;
         
-        // 2. 指纹匹配测试：
-        // size 为偶数时，指纹完全匹配 -> 预期验证成功
-        // size 为奇数时，指纹不匹配 -> 预期验证失败
+        // 2. Fingerprint matching test:
+        // When size is even, fingerprint matches completely -> expected verification success
+        // When size is odd, fingerprint mismatch -> expected verification failure
         if (size % 2 == 0) {
             info.fingerprint = fuzzString;
         } else {
             info.fingerprint = "mismatch_" + fuzzString;
         }
 
-        // 3. 随机状态码测试
-        // 偶数时模拟 HTTP 200 OK，奇数时模拟 HTTP 404/500 等错误
+        // 3. Random status code test
+        // Even: simulate HTTP 200 OK; Odd: simulate HTTP 404/500 errors
         ResponseCode code = (size % 2 == 0) ? ResponseCode::OK : ResponseCode::NOT_FOUND;
 
         DomainVerifier::VerifyHost(code, jsonStr, info);
@@ -95,14 +96,14 @@ namespace OHOS {
 
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
     {
-        // 结合两种策略，最大化测试覆盖面
+        // Combine two strategies to maximize test coverage
         
-        // 1. 纯随机数据 (概率 50%)
+        // 1. Pure random data (50% probability)
         if (size % 2 != 0) {
             FuzzVerifyHostWithRawData(data, size);
         }
         
-        // 2. 结构化模板数据 (概率 50%)
+        // 2. Structured template data (50% probability)
         if (size % 2 == 0) {
             FuzzVerifyHostWithTemplate(data, size);
         }
