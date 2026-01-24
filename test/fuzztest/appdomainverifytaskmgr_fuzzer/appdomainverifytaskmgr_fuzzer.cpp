@@ -17,9 +17,21 @@
 
 #include "app_domain_verify_task_mgr.h"
 #include "verify_http_task.h"
+#include "i_verify_task.h"
 #include <string>
+#include <memory>
 
 using namespace OHOS::AppDomainVerify;
+
+class MockVerifyTask : public IVerifyTask {
+public:
+    void OnPostVerify(const std::string& uri, const NetStack::HttpClient::HttpClientResponse& response) override {}
+    void OnSaveVerifyResult() override {}
+    bool OnPreRequest(NetStack::HttpClient::HttpClientRequest& request, const std::string& uri) override { return true; }
+    const HostVerifyStatusMap& GetUriVerifyMap() override { return map_; }
+    TaskType GetType() override { return static_cast<TaskType>(1); }
+    HostVerifyStatusMap map_;
+};
 
 namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
@@ -28,14 +40,15 @@ namespace OHOS {
             return false;
         }
         std::string testString(reinterpret_cast<const char*>(data), size);
+        std::string testUri = "https://" + testString;
         
-        // Construct a dummy task
-        // Assuming VerifyHttpTask can be constructed with a task ID or URL
-        // Here we fuzz the key (taskId) used in the manager
-        auto task = std::make_shared<VerifyHttpTask>(); 
+        // Construct a MockVerifyTask
+        auto mockTask = std::make_shared<MockVerifyTask>();
+        // Construct VerifyHttpTask with the mock
+        auto httpTask = std::make_shared<VerifyHttpTask>(testUri, mockTask);
         
         // Fuzz AddTask
-        AppDomainVerifyTaskMgr::GetInstance()->AddTask(testString, task);
+        AppDomainVerifyTaskMgr::GetInstance()->AddTask(testString, httpTask);
 
         // Fuzz HasTask
         AppDomainVerifyTaskMgr::GetInstance()->HasTask(testString);

@@ -17,8 +17,8 @@
 
 #include "white_list_config_mgr.h"
 #include <string>
-
-using namespace OHOS::AppDomainVerify;
+#include <unordered_set>
+#include <vector>
 
 namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
@@ -26,10 +26,24 @@ namespace OHOS {
         if (data == nullptr || size == 0) {
             return false;
         }
-        std::string testDomain(reinterpret_cast<const char*>(data), size);
+
+        // Split data for updating whitelist and checking
+        std::string input(reinterpret_cast<const char*>(data), size);
+        std::string updateStr = input.substr(0, size / 2);
+        std::string checkStr = input.substr(size / 2);
+
+        AppDomainVerify::WhiteListConfigMgr mgr;
         
+        // Fuzz UpdateWhiteList
+        std::unordered_set<std::string> whiteList;
+        whiteList.insert(updateStr);
+        // Add some hardcoded ones to ensure hits are possible if checkStr matches
+        whiteList.insert("example.com");
+        mgr.UpdateWhiteList(whiteList);
+
         // Fuzz IsInWhiteList logic
-        WhiteListConfigMgr::GetInstance().IsInWhiteList(testDomain);
+        mgr.IsInWhiteList(checkStr);
+        mgr.IsInWhiteList("example.com");
 
         return true;
     }
