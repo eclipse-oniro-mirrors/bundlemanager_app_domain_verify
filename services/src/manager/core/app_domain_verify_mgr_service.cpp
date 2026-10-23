@@ -97,6 +97,10 @@ void AppDomainVerifyMgrService::VerifyDomain(const std::string& appIdentifier, c
     VerifyResultInfo verifyResultInfo;
     verifyResultInfo.appIdentifier = appIdentifier;
 
+    // Check if app is pre-installed
+    bool isPreInstalled = BundleInfoQuery::IsPreInstalledApp(bundleName);
+    appVerifyBaseInfo.isPreinstalled = isPreInstalled;
+
     CollectDomains(skillUris, verifyResultInfo);
     DelayedSingleton<AppDomainVerifyDataMgr>::GetInstance()->InsertVerifyStatus(bundleName, verifyResultInfo);
     AppDomainVerifyAgentClient::GetInstance()->SingleVerify(appVerifyBaseInfo, verifyResultInfo);
@@ -132,7 +136,8 @@ void AppDomainVerifyMgrService::FilterAbilitiesInner(std::string hostVerifyKey,
             continue;
         }
 
-        if (itr->second.status == InnerVerifyStatus::STATE_SUCCESS) {
+        if (itr->second.status == InnerVerifyStatus::STATE_SUCCESS ||
+            itr->second.status == InnerVerifyStatus::PRE_INSTALLED) {
             auto ability = *it;
             auto priority = itr->second.priority;
             auto tuple = std::make_tuple(ability, priority);
