@@ -15,9 +15,7 @@
     "syscap": [
       "SystemCapability.BundleManager.AppDomainVerify"
     ],
-    "features": [
-      "app_domain_verify_feature_target_from_cloud"
-    ],
+    "features": ["app_domain_verify_feature_target_from_cloud"],
     "hisysevent_config": [
       "//foundation/bundlemanager/app_domain_verify/hisysevent.yaml"
     ],
