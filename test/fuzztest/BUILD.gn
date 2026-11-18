@@ -21,6 +21,7 @@ group("app_domain_verify_fuzz_test") {
     "appdomainverifyagentservice_fuzzer:AppDomainVerifyAgentServiceFuzzTest",
     "appdomainverifymgrservice_fuzzer:AppDomainVerifyMgrServiceFuzzTest",
     "hu_fuzzer:fuzztest",
+    "r_appdomain_fuzzer:fuzztest",
   ]
 }
 
