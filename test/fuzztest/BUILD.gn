@@ -20,5 +20,12 @@ group("app_domain_verify_fuzz_test") {
   deps = [
     "appdomainverifyagentservice_fuzzer:AppDomainVerifyAgentServiceFuzzTest",
     "appdomainverifymgrservice_fuzzer:AppDomainVerifyMgrServiceFuzzTest",
+    "hu_fuzzer:fuzztest",
   ]
+}
+
+group("fuzztest") {
+  testonly = true
+
+  deps = [ ":app_domain_verify_fuzz_test" ]
 }
