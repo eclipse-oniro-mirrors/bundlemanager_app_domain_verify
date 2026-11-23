@@ -156,6 +156,13 @@
       "test": [
         "//foundation/bundlemanager/app_domain_verify/test/unittest:app_domain_verify_unit_test",
         "//foundation/bundlemanager/app_domain_verify/test/fuzztest:app_domain_verify_fuzz_test",
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/domainurlutil_fuzzer:fuzztest",
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/domainjsonutil_fuzzer:fuzztest",
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/domainverifier_fuzzer:fuzztest",
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/convertcallbackstub_fuzzer:fuzztest",
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/appdomainverifytaskmgr_fuzzer:fuzztest",
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/whitelistconfigmgr_fuzzer:fuzztest",
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/bundleverifystatusinfo_fuzzer:fuzztest",
         "//foundation/bundlemanager/app_domain_verify/test/fuzztest/hu_fuzzer:fuzztest"
       ]
     }
