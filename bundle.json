@@ -53,7 +53,8 @@
         "memmgr",
         "runtime_core",
         "common_event_service",
-        "selinux_adapter"
+        "selinux_adapter",
+        "taihe_ffi_gen"
       ],
       "third_party": [
         "openssl"
@@ -161,7 +162,8 @@
         "//foundation/bundlemanager/app_domain_verify/test/fuzztest/convertcallbackstub_fuzzer:fuzztest",
         "//foundation/bundlemanager/app_domain_verify/test/fuzztest/appdomainverifytaskmgr_fuzzer:fuzztest",
         "//foundation/bundlemanager/app_domain_verify/test/fuzztest/whitelistconfigmgr_fuzzer:fuzztest",
-        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/bundleverifystatusinfo_fuzzer:fuzztest"
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/bundleverifystatusinfo_fuzzer:fuzztest",
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/hu_fuzzer:fuzztest"
       ]
     }
   }

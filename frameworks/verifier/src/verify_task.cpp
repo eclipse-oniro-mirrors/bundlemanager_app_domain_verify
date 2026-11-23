@@ -27,6 +27,7 @@
 #include "domain_url_util.h"
 #include "app_domain_verify_task_mgr.h"
 #include "verify_http_task.h"
+#include "bundle_info_query.h"
 
 namespace OHOS {
 namespace AppDomainVerify {
@@ -43,13 +44,19 @@ void VerifyTask::OnPostVerify(const std::string& uri, const OHOS::NetStack::Http
         (appVerifyBaseInfo_.priority < PRIORITY_MIN || appVerifyBaseInfo_.priority > PRIORITY_MAX)) {
         status = InnerVerifyStatus::FAILURE_CLIENT_ERROR;
     }
+    if (status == InnerVerifyStatus::FAILURE_HTTP_UNKNOWN && appVerifyBaseInfo_.isPreinstalled) {
+        status = InnerVerifyStatus::PRE_INSTALLED;
+    }
     APP_DOMAIN_VERIFY_HILOGD(APP_DOMAIN_VERIFY_AGENT_MODULE_SERVICE,
         "OnPostVerify status %{public}d appId:%{public}s, priority:%{public}d", status,
         appVerifyBaseInfo_.appIdentifier.c_str(), appVerifyBaseInfo_.priority);
     UpdateVerifyResultInfo(uri, status);
-    unVerifiedSet_.erase(uri);
-    if (unVerifiedSet_.empty()) {
-        OnSaveVerifyResult();
+    {
+        std::unique_lock<ffrt::mutex> lock(unVerifiedSetMutex_);
+        unVerifiedSet_.erase(uri);
+        if (unVerifiedSet_.empty()) {
+            OnSaveVerifyResult();
+        }
     }
     VERIFY_RESULT_EVENT(appVerifyBaseInfo_.appIdentifier, appVerifyBaseInfo_.bundleName, type_, status);
 }
@@ -80,6 +87,7 @@ const HostVerifyStatusMap& VerifyTask::GetUriVerifyMap()
 void VerifyTask::InitUriUnVerifySetMap(const VerifyResultInfo& verifyResultInfo)
 {
     APP_DOMAIN_VERIFY_HILOGD(APP_DOMAIN_VERIFY_AGENT_MODULE_SERVICE, "called");
+    std::unique_lock<ffrt::mutex> lock(unVerifiedSetMutex_);
     for (const auto& hostVerifyStatusInfo : verifyResultInfo.hostVerifyStatusMap) {
         if (IsNeedRetry(hostVerifyStatusInfo.second)) {
             unVerifiedSet_.insert(hostVerifyStatusInfo.first);
@@ -119,8 +127,13 @@ bool VerifyTask::SaveDomainVerifyStatus(const std::string& bundleName, const Ver
 
 void VerifyTask::Execute()
 {
+    std::unordered_set<std::string> unVerifiedSetTmp;
+    {
+        std::unique_lock<ffrt::mutex> lock(unVerifiedSetMutex_);
+        unVerifiedSetTmp = unVerifiedSet_;
+    }
     for (auto& hostVerifyStatusInfo : verifyResultInfo_.hostVerifyStatusMap) {
-        if (unVerifiedSet_.count(hostVerifyStatusInfo.first) != 0) {
+        if (unVerifiedSetTmp.count(hostVerifyStatusInfo.first) != 0) {
             auto verifyHttpTask = std::make_shared<VerifyHttpTask>(hostVerifyStatusInfo.first, shared_from_this());
             AppDomainVerifyTaskMgr::GetInstance()->AddTask(verifyHttpTask);
         }
