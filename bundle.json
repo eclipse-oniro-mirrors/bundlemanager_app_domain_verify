@@ -163,6 +163,7 @@
         "//foundation/bundlemanager/app_domain_verify/test/fuzztest/appdomainverifytaskmgr_fuzzer:fuzztest",
         "//foundation/bundlemanager/app_domain_verify/test/fuzztest/whitelistconfigmgr_fuzzer:fuzztest",
         "//foundation/bundlemanager/app_domain_verify/test/fuzztest/bundleverifystatusinfo_fuzzer:fuzztest",
+        "//foundation/bundlemanager/app_domain_verify/test/fuzztest/r_appdomain_fuzzer:fuzztest",
         "//foundation/bundlemanager/app_domain_verify/test/fuzztest/hu_fuzzer:fuzztest"
       ]
     }
